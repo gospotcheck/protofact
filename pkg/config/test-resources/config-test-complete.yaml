@@ -1,0 +1,17 @@
+language: ruby
+loglevel: debug
+git:
+  username: user
+  password: pass
+webhook:
+  secret: asupersecretkey
+ruby:
+  authors: somepeople
+  email: dev@dev.com
+  gemrepouser: user
+  gemrepopass: pass
+  gemrepohost: https://somegemrepo.com
+  gemname: proto-demo
+  grpcversion: '1.19.0'
+  homepage: https://github.com/someorg/somerepo
+  publish: false

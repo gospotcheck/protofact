@@ -1,0 +1,24 @@
+FROM alpine:3.9.2
+
+ARG SCALA_VERSION=2.11.12
+
+ENV NAME protofact
+ENV LANGUAGE scala
+
+RUN apk add --update bash
+
+COPY docker/scala/install_scala.sh .
+
+RUN ./install_scala.sh
+
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+
+ENV PATH "$JAVA_HOME/bin:$PATH"
+
+RUN apk del .build-dependencies wget curl
+
+RUN touch config.yaml
+
+COPY protofact .
+
+CMD ./protofact

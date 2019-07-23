@@ -1,0 +1,16 @@
+FROM alpine:3.9.2
+
+ENV NAME protofact
+ENV LANGUAGE ruby
+
+RUN apk add --update bash curl git
+
+COPY docker/ruby/install_ruby.sh .
+
+RUN ./install_ruby.sh
+
+RUN touch config.yaml
+
+COPY protofact .
+
+CMD ./protofact

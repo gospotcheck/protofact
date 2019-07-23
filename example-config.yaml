@@ -1,0 +1,30 @@
+language: ruby
+loglevel: debug
+git:
+  username: user
+  password: pass
+webhook:
+  secret: asupersecretkey
+ruby:
+  authors: somepeople
+  email: dev@dev.com
+  gemrepouser: user
+  gemrepopass: pass
+  gemrepohost: https://somegemrepo.com
+  gemname: proto-demo
+  grpcversion: '1.19.0'
+  homepage: https://github.com/someorg/somerepo
+  publish: false
+scala:
+  description: Proto gen files for company x
+  grpcpackagesversion: '1.15.1'
+  gogoprotojavaversion: '1.0.0'
+  mavenrepopublishtarget: https://somejarrepo/maven
+  jarname: proto-demo
+  organization: company x
+  publish: false
+  realm: PrivateRepoProduct
+  sbtversion: '1.13.8'
+  sbtassemblyversion: '0.14.5'
+  scalaversion: '2.11.11'
+  scalatestversion: '3.0.5'

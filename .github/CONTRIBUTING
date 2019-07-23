@@ -1,0 +1,29 @@
+# Contributing
+
+First, thank you for contributing! We love and encourage pull requests from everyone.
+
+Before submitting major changes, here are a few guidelines to follow:
+
+1. Check the [open issues][issues] and [pull requests][prs] for existing discussions.
+1. Open an [issue][issues] first, to discuss a new feature or enhancement.
+1. Write tests, and make sure the test suite passes locally and on CI.
+1. Open a pull request, and reference the relevant issue(s).
+1. After receiving feedback, [squash your commits][squash] and add a [great commit message][message].
+1. Have fun!
+
+[issues]: https://github.com/gospotcheck/protofact/issues
+[prs]: https://github.com/gospotcheck/protofact/pulls
+[squash]: http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html
+[message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+
+## Development
+
+Protofact uses Go modules for dependency management, so you must be using Go 11.1 or higher
+to work on it (but ideally you're on the latest version).
+
+To get started, clone the repo and run `$ go mod download`.
+
+Protofact uses [Packr](https://github.com/gobuffalo/packr/tree/master/v2)
+boxes to supply templates into the binary. For the packages to work correctly, you'll
+need to install packr v2 via `$ go get -u github.com/gobuffalo/packr/v2/packr2` and then
+run `$ packr2` in the root directory of the project. See the docs on Packr for more info.
