@@ -54,9 +54,9 @@ languages, and overall better! See our contributing page for details on how to c
 
 In no particular order...
 
-[ ] Node/Typescript support
-[ ] Tagging Go commits to match the version of other language packages
-[ ] Python support
-[ ] C++ support
-[ ] C# support
-[ ] Objective-C support
+- [ ] Node/Typescript support
+- [ ] Tagging Go commits to match the version of other language packages
+- [ ] Python support
+- [ ] C++ support
+- [ ] C# support
+- [ ] Objective-C support
