@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd" xmlns="http://maven.apache.org/SETTINGS/1.1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <servers>
+    <server>
+      <username>{{ .Username }}</username>
+      <password>{{ .Password }}</password>
+      <id>privatecentral</id>
+    </server>
+    <server>
+      <username>{{ .Username }}</username>
+      <password>{{ .Password }}</password>
+      <id>privatesnapshots</id>
+    </server>
+  </servers>
+</settings>
+<project>
+  <organization>
+    <name>{{ .Organization }}</name>
+  </organization>
+  <groupId>{{ .MavenGroupID }}</groupId>
+  <artifactId>{{ .MavenArtifactID }} </artifactId>
+  <version>1.0.{{ .BuildNumber }}{{ .Snapshot }}</version>
+  <properties>
+    <maven.compiler.source>{{ .MavenVersion }}</maven.compiler.source>
+    <maven.compiler.target>{{ .MavenVersion }}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>privatecentral</id>
+      <name>libs-release</name>
+      <url>{{ .LibReleaseURL }}</url>
+    </repository>
+    <repository>
+      <snapshots />
+      <id>privatesnapshots</id>
+      <name>libs-snapshot</name>
+      <url>{{ .LibSnapshotURL }}</url>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>{{ .GRPCPackagesVersion }}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-services</artifactId>
+      <version>{{ .GRPCPackagesVersion }}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-netty-shaded</artifactId>
+      <version>{{ .GRPCPackagesVersion }}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <defaultGoal>package</defaultGoal>
+    <directory>${basedir}/target</directory>
+    <finalName>${artifactId}-${version}</finalName>
+  </build>
+  <distributionManagement>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>privatecentral</id>
+      <name>libs-release</name>
+      <url>{{ .LibReleaseURL }}</url>
+    </repository>
+    <snapshotRepository>
+      <snapshots />
+      <id>privatesnapshots</id>
+      <name>libs-snapshot</name>
+      <url>{{ .LibSnapshotURL }}</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>
