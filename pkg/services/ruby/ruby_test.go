@@ -132,3 +132,20 @@ func Test_CreateGem(t *testing.T) {
 	gemName := fmt.Sprintf("protos-demo-%s.gem", version)
 	assert.Contains(t, files, gemName)
 }
+
+func Test_GetGemCredentials(t *testing.T{
+	config := Config{
+		Authors:     "Devs",
+		Email:       "devs@dev.com",
+		Publish:     false,
+		GemName:     "protos-demo",
+		GemRepoHost: "https://somerepo.gems.com",
+		GRPCVersion: "1.19.0",
+		Homepage:    "https://github.com/gospotcheck/protofact",
+	}
+	user := "Not a Good User"
+	pass := "Password (<- It's an unacceptable password, hence the 'bad credential' context if ya catch ny drift)"
+	host := config.GemRepoHost
+	lousyCreds := getGemCredentials(user, pass, host)
+	assert.Contains(t, lousyCreds.Error(), "could not successfully get api key")
+}
