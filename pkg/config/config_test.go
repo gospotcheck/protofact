@@ -19,7 +19,7 @@ func Test_Read(t *testing.T) {
 		assert.Equal(t, conf.LogLevel, "debug")
 		assert.Equal(t, conf.Language, "ruby")
 		assert.Equal(t, conf.Git.Username, "user")
-		assert.Equal(t, conf.Git.Password, "pass")
+		assert.Equal(t, conf.Git.Token, "pass")
 		assert.Equal(t, conf.Webhook.Secret, "asupersecretkey")
 		assert.Equal(t, conf.Ruby.Authors, "somepeople")
 		assert.Equal(t, conf.Ruby.Email, "dev@dev.com")
@@ -57,6 +57,6 @@ func Test_Read(t *testing.T) {
 		conf, err := Read("./test-resources/config-test-complete.yaml")
 		assert.Nil(t, err)
 		assert.Equal(t, conf.Git.Username, "envuser")
-		assert.Equal(t, conf.Git.Password, "pass")
+		assert.Equal(t, conf.Git.Token, "pass")
 	})
 }

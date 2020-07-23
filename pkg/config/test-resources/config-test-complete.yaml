@@ -2,7 +2,7 @@ language: ruby
 loglevel: debug
 git:
   username: user
-  password: pass
+  token: pass
 webhook:
   secret: asupersecretkey
 ruby:

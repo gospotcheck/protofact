@@ -1,10 +1,12 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
 
+	"github.com/go-resty/resty/v2"
 	g "github.com/gogits/git-module"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -13,24 +15,38 @@ import (
 
 // Config represents the inputs needed to set up a Repo.
 type Config struct {
-	Username string
-	Password string
+	Username   string
+	Token      string
+	BaseAPIURL string
+}
+
+// CreateReleaseRequest is the fields necessary for the body of a
+// post request to create a release in Github.
+type CreateReleaseRequest struct {
+	TagName         string `json:"tag_name"`
+	TargetCommitish string `json:"target_commitish"`
+	Name            string `json:"name"`
+	Body            string `json:"body"`
+	Draft           bool   `json:"draft"`
+	Prerelease      bool   `json:"prerelease"`
 }
 
 // Repo represents a git repository, which receives convenience methods
 // for retrieving code.
 type Repo struct {
-	username string
-	password string
-	logger   *log.Entry
+	username   string
+	token      string
+	logger     *log.Entry
+	baseAPIURL string
 }
 
 // New creates a Repo struct using a Config struct.
 func New(c Config, logger *log.Entry) *Repo {
 	return &Repo{
-		username: c.Username,
-		password: c.Password,
-		logger:   logger,
+		username:   c.Username,
+		token:      c.Token,
+		logger:     logger,
+		baseAPIURL: c.BaseAPIURL,
 	}
 }
 
@@ -56,11 +72,50 @@ func (r *Repo) CloneWithCheckout(tmpDir string, payload github.PushPayload) erro
 func (r *Repo) CreateAuthenticatedURL(cloneURL string) (string, error) {
 	splitURL := strings.Split(cloneURL, "://")
 	// passwords often have characters that need escaping in them
-	p := url.QueryEscape(r.password)
+	p := url.QueryEscape(r.token)
 	authURL := fmt.Sprintf("%s://%s:%s@%s", splitURL[0], r.username, p, splitURL[1])
 	parsedURL, err := url.Parse(authURL)
 	if err != nil {
 		return "", errors.Wrap(err, "clone url was not valid")
 	}
 	return parsedURL.String(), nil
+}
+
+// CreateRelease sends a request to github using the passed body and payload structs
+// to create a new release on a repo
+func (r *Repo) CreateRelease(ctx context.Context, req CreateReleaseRequest, payload github.PushPayload) error {
+	endpoint := fmt.Sprintf(
+		"%s/repos/%s/%s/releases",
+		r.baseAPIURL,
+		payload.Repository.Owner.Login,
+		payload.Repository.Name,
+	)
+
+	// make a release
+	// https://docs.github.com/en/rest/reference/repos#create-a-release
+	client := resty.New()
+	resp, err := client.R().
+		SetBody(req).
+		SetContext(ctx).
+		SetHeader("accept", "application/vnd.github.v3+json").
+		SetBasicAuth(r.username, r.token).
+		Post(endpoint)
+
+	if err != nil {
+		return errors.Wrap(err, "failed to create release")
+	}
+
+	// default status code is 201, if it's not, and there wasn't an error
+	// something still likely went wrong
+	if resp.StatusCode() != int(201) {
+		msg := fmt.Sprintf(
+			"tag for repo %s on commit %s failed with code %d\n",
+			payload.Repository.FullName,
+			payload.HeadCommit.ID,
+			resp.StatusCode(),
+		)
+		return errors.New(msg)
+	}
+
+	return nil
 }
