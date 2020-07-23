@@ -24,6 +24,7 @@ import (
 	"github.com/gospotcheck/protofact/pkg/filesys"
 	"github.com/gospotcheck/protofact/pkg/git"
 	"github.com/gospotcheck/protofact/pkg/metrics"
+	"github.com/gospotcheck/protofact/pkg/services/release"
 	"github.com/gospotcheck/protofact/pkg/services/ruby"
 	"github.com/gospotcheck/protofact/pkg/services/scala"
 	"github.com/gospotcheck/protofact/pkg/webhook"
@@ -153,6 +154,8 @@ func main() {
 			svc = scala.New(conf.Scala, fs, repo, logger, counters, opentracing.GlobalTracer())
 		case "ruby":
 			svc = ruby.New(conf.Ruby, fs, repo, logger, counters, opentracing.GlobalTracer())
+		case "release":
+			svc = release.New(repo, logger, counters, opentracing.GlobalTracer())
 		default:
 			err = errors.New("LANGUAGE configuration did not match any supported language")
 			logger.Fatalf("%+v\n", err)

@@ -100,7 +100,7 @@ func (s *Service) Process(ctx context.Context, payload github.PushPayload) {
 		err := s.repo.CreateRelease(ctx, reqBody, payload)
 
 		if err != nil {
-			s.metrics.AddPackagingErrors(prometheus.Labels{"type": "tag"}, 1)
+			s.metrics.AddPackagingErrors(prometheus.Labels{"type": "release"}, 1)
 			s.logger.Errorf("%+v\n", errors.WithStack(err))
 			return
 		}
