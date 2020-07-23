@@ -1,4 +1,4 @@
-// Package scala builds jars from Java code and uses sbt to publish them.
+// Package scala builds jars from Scala code and uses sbt to publish them.
 package scala
 
 import (
@@ -54,23 +54,21 @@ type Service struct {
 }
 
 type templateValues struct {
-	BuildNumber            int64
-	Description            string
-	GRPCPackagesVersion    string
-	GogoProtoJavaVersion   string
-	JarDir                 string
-	MavenRepoPublishTarget string
-	MavenRepoHost          string
-	MavenRepoUser          string
-	MavenRepoPassword      string
-	Name                   string
-	Organization           string
-	Realm                  string
-	SBTVersion             string
-	SBTAssemblyVersion     string
-	ScalaVersion           string
-	ScalaTestVersion       string
-	Snapshot               bool
+	BuildNumber                   int64
+	Description                   string
+	JarDir                        string
+	MavenRepoPublishTarget        string
+	MavenRepoHost                 string
+	MavenRepoUser                 string
+	MavenRepoPassword             string
+	Name                          string
+	Organization                  string
+	Realm                         string
+	SBTVersion                    string
+	SBTProtocPluginPackageVersion string
+	ScalaVersion                  string
+	ScalaPBRuntimePackageVersion  string
+	Snapshot                      bool
 }
 
 type processorProps struct {
@@ -148,7 +146,7 @@ func (s *Service) Process(ctx context.Context, payload github.PushPayload) {
 			return
 		}
 
-		// get all relevant subdirectories (java/com/*) and process them into their own directories to publish
+		// get all relevant subdirectories (scala/com/*) and process them into their own directories to publish
 		jarDir, err := createJar(ctx, s.fs, s.config, s.logger, path, payload, procProps)
 		if err != nil {
 			s.metrics.AddPackagingErrors(prometheus.Labels{"type": "create"}, 1)
@@ -185,36 +183,36 @@ func (s *Service) cloneCode(ctx context.Context, payload github.PushPayload, pro
 	return cloneDir, nil
 }
 
-// CreateJar takes a path and finds all directories in the subpath of java/com in that path. We package at that level.
+// CreateJar takes a path and finds all directories in the subpath of scala/com in that path. We package at that level.
 // For those directories it processes the templates in the scala package to create a directory mirroring the structure
 // of a publishable jar.
 func createJar(ctx context.Context, fs fs, config Config, logger log.FieldLogger, codePath string, payload github.PushPayload, props processorProps) (string, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "create_jars")
 	span.SetTag("directory", codePath)
 	// subdirectories of the language
-	javaSubDir := fmt.Sprintf("%s/java/com", codePath)
-	subdirs, err := fs.GetSubDirectories(javaSubDir)
+	scalaSubDir := fmt.Sprintf("%s/scala/com", codePath)
+	subdirs, err := fs.GetSubDirectories(scalaSubDir)
 	if err != nil {
 		return "", errors.Wrap(err, "could not get subdirectories in the clone dir")
 	}
 
 	snapshot := !strings.Contains(payload.Ref, "master")
 	values := templateValues{
-		Name:                   config.JarName,
-		JarDir:                 ".",
-		BuildNumber:            payload.Repository.PushedAt,
-		Description:            config.Description,
-		GRPCPackagesVersion:    config.GRPCPackagesVersion,
-		MavenRepoPublishTarget: config.MavenRepoPublishTarget,
-		MavenRepoHost:          config.MavenRepoHost,
-		MavenRepoUser:          config.MavenRepoUser,
-		MavenRepoPassword:      config.MavenRepoPassword,
-		Organization:           config.Organization,
-		Realm:                  config.Realm,
-		SBTVersion:             config.SBTVersion,
-		SBTAssemblyVersion:     config.SBTAssemblyVersion,
-		ScalaVersion:           config.ScalaVersion,
-		Snapshot:               snapshot,
+		Name:                          config.JarName,
+		JarDir:                        ".",
+		BuildNumber:                   payload.Repository.PushedAt,
+		Description:                   config.Description,
+		MavenRepoPublishTarget:        config.MavenRepoPublishTarget,
+		MavenRepoHost:                 config.MavenRepoHost,
+		MavenRepoUser:                 config.MavenRepoUser,
+		MavenRepoPassword:             config.MavenRepoPassword,
+		Organization:                  config.Organization,
+		Realm:                         config.Realm,
+		SBTVersion:                    config.SBTVersion,
+		SBTProtocPluginPackageVersion: config.SBTProtocPluginPackageVersion,
+		ScalaVersion:                  config.ScalaVersion,
+		ScalaPBRuntimePackageVersion:  config.ScalaPBRuntimePackageVersion,
+		Snapshot:                      snapshot,
 	}
 
 	logger.Debug(fmt.Sprintf("%+v", values))
@@ -236,7 +234,7 @@ func createJar(ctx context.Context, fs fs, config Config, logger log.FieldLogger
 		}
 
 		// move files from git repo over
-		err = cp.Copy(fmt.Sprintf("%s/java/com/%s", codePath, dir), fmt.Sprintf("%s/com/%s", jarDir, dir))
+		err = cp.Copy(fmt.Sprintf("%s/scala/com/%s", codePath, dir), fmt.Sprintf("%s/com/%s", jarDir, dir))
 		if err != nil {
 			return "", errors.Wrap(err, "could not copy over code files")
 		}
@@ -305,6 +303,16 @@ func processTemplates(ctx context.Context, logger log.FieldLogger, jarDir string
 	err = processFileTemplate(logger, "build.sbt", buildTemplate, buildOutPath, values)
 	if err != nil {
 		return errors.Wrap(err, "could not process build.sbt template")
+	}
+
+	scalapbTemplate, err := templates.FindString("scalapb.sbt")
+	if err != nil {
+		return errors.Wrap(err, "could not find scalapb.sbt template")
+	}
+	scalapbOutPath := fmt.Sprintf("%s/scalapb.sbt", jarDir)
+	err = processFileTemplate(logger, "scalapb.sbt", scalapbTemplate, scalapbOutPath, values)
+	if err != nil {
+		return errors.Wrap(err, "could not process scalapb.sbt template")
 	}
 
 	versionTemplate, err := templates.FindString("version.sbt")

@@ -47,8 +47,8 @@ package equivalence without resorting to building a complex tracking system of t
 ## This Could Be More Awesome
 
 We agree! For 0.1.0, we have strived to make this as configurable as possible, but Protofact comes from our internal processes
-and all their idiosyncracies. For example, we're packaging up our Java code using SBT and Scala packaging processes because
-we have more Scala experts than Java. We hope members of the community will contribute and make this more flexible, supporting more
+and their idiosyncracies. For example right now the sbt and Scala versions are locked to what we use. 
+We hope members of the community will contribute and make this more flexible, supporting more
 languages, and overall better! See our contributing page for details on how to contribute.
 
 ### Planned improvements
@@ -61,3 +61,4 @@ In no particular order...
 - [ ] C++ support
 - [ ] C# support
 - [ ] Objective-C support
+- [ ] Java support

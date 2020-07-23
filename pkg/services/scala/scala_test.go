@@ -52,19 +52,17 @@ func Test_CreateJars(t *testing.T) {
 
 	fs := &filesys.FS{}
 	config := Config{
-		Description:            "Proto-Gen files for Organization X",
-		GRPCPackagesVersion:    "1.15.1",
-		GogoProtoJavaVersion:   "1.0.0",
-		MavenRepoPublishTarget: "https://repo1.maven.org/maven2",
-		MavenRepoUser:          "user",
-		MavenRepoPassword:      "password",
-		Organization:           "Org X",
-		Publish:                false,
-		Realm:                  "Artifactory",
-		SBTVersion:             "0.13.18",
-		SBTAssemblyVersion:     "0.14.5",
-		ScalaVersion:           "2.11.11",
-		ScalaTestVersion:       "3.0.5",
+		Description:                   "Proto-Gen files for Organization X",
+		MavenRepoPublishTarget:        "https://repo1.maven.org/maven2",
+		MavenRepoUser:                 "user",
+		MavenRepoPassword:             "password",
+		Organization:                  "Org X",
+		Publish:                       false,
+		Realm:                         "Artifactory",
+		SBTVersion:                    "1.3.13",
+		SBTProtocPluginPackageVersion: "0.99.33",
+		ScalaVersion:                  "2.11.12",
+		ScalaPBRuntimePackageVersion:  "0.10.0-M4",
 	}
 	if err != nil {
 		t.Error(err)
@@ -96,7 +94,7 @@ func Test_CreateJars(t *testing.T) {
 	if err != nil {
 		t.Errorf("%+v\n", err)
 	}
-	assert.Len(t, files, 2)
+	assert.Len(t, files, 3)
 	assert.Contains(t, files, "build.sbt")
 	assert.Contains(t, files, "version.sbt")
 

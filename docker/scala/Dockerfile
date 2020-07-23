@@ -1,11 +1,9 @@
-FROM alpine:3.9.2
+FROM alpine:3.12.0
 
 ARG SCALA_VERSION=2.11.12
 ARG PROTOFACT_VERSION
-ARG ARTIFACTORY_USERNAME
-ARG ARTIFACTORY_PASSWORD
 
-ENV NAME proto-pkg
+ENV NAME protofact
 ENV LANGUAGE scala
 ENV VERSION $PROTOFACT_VERSION
 
@@ -16,15 +14,18 @@ COPY docker/scala/install_scala.sh .
 RUN ./install_scala.sh
 
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+ENV SCALA_HOME /usr/share/scala
 
 ENV PATH "$JAVA_HOME/bin:$PATH"
 
-# TODO: put in retrieval of Github release binary
+RUN wget https://github.com/gospotcheck/protofact/releases/download/${VERSION}/protofact_linux-amd64.tar.gz && \
+  tar -xvf protofact_linux-amd64 && \
+  rm protofact_linux-amd64.tar.gz
 
 RUN apk del .build-dependencies wget curl
 
 RUN touch config.yaml
 
-RUN chmod +x protofact-$VERSION-linux-x86_64
+RUN chmod +x protofact_linux-x86_64
 
-CMD ./protofact-$VERSION-linux-x86_64
+CMD ./protofact_linux-x86_64

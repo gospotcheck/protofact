@@ -17,14 +17,12 @@ ruby:
   publish: false
 scala:
   description: Proto gen files for company x
-  grpcpackagesversion: '1.15.1'
-  gogoprotojavaversion: '1.0.0'
   mavenrepopublishtarget: https://somejarrepo/maven
   jarname: proto-demo
   organization: company x
   publish: false
   realm: PrivateRepoProduct
-  sbtversion: '1.13.8'
-  sbtassemblyversion: '0.14.5'
-  scalaversion: '2.11.11'
-  scalatestversion: '3.0.5'
+  sbtversion: '0.13.18'
+  scalaversion: '2.11.12'
+  sbtprotocpluginpackageversion: '0.99.33'
+  scalapbtruntimepackageversion: '0.10.0-M4'

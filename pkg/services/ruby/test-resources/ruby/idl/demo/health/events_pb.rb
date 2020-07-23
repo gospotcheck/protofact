@@ -3,7 +3,6 @@
 
 require 'google/protobuf'
 
-require 'github.com/gogo/protobuf/gogoproto/gogo_pb'
 require 'google/protobuf/any_pb'
 require 'google/protobuf/timestamp_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
