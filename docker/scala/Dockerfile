@@ -26,6 +26,6 @@ RUN apk del .build-dependencies wget curl
 
 RUN touch config.yaml
 
-RUN chmod +x protofact-$VERSION-linux-x86_64
+RUN chmod +x protofact_linux-x86_64
 
-CMD ./protofact-$VERSION-linux-x86_64
+CMD ./protofact_linux-x86_64
