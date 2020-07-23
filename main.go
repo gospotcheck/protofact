@@ -49,6 +49,7 @@ func main() {
 		errors.Wrap(err, "could not read in config:\n")
 		log.Fatalf("%+v", err)
 	}
+	conf.Git.BaseAPIURL = "https://api.github.com"
 
 	// setup logger
 
