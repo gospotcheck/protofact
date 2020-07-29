@@ -8,6 +8,7 @@ import (
 
 	"github.com/gospotcheck/protofact/pkg/git"
 
+	g "github.com/gogits/git-module"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -84,7 +85,8 @@ func (s *Service) Process(ctx context.Context, payload github.PushPayload) {
 			version = fmt.Sprintf("v1.0.%d", payload.Repository.PushedAt)
 			prerelease = false
 		} else {
-			version = fmt.Sprintf("v1.0.%d-beta", payload.Repository.PushedAt)
+			branch := g.RefEndName(payload.Ref)
+			version = fmt.Sprintf("v1.0.%d-beta.%s", payload.Repository.PushedAt, branch)
 			prerelease = true
 		}
 
