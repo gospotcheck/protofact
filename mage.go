@@ -209,7 +209,7 @@ func (Release) BuildReleaseContainer(ctx context.Context) error {
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:release-%s", version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
-	if err := sh.Run("docker", "build", "-t", tag, "./docker/release/Dockerfile" "--build-arg", buildArg); err != nil {
+	if err := sh.Run("docker", "build", "-t", tag, "./docker/release/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
 		return err
@@ -235,7 +235,7 @@ func (Release) BuildRubyContainer(ctx context.Context) error {
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:ruby-%s", version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
-	if err := sh.Run("docker", "build", "-t", tag, "./docker/ruby/Dockerfile" "--build-arg", buildArg); err != nil {
+	if err := sh.Run("docker", "build", "-t", tag, "./docker/ruby/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
 		return err
@@ -261,7 +261,7 @@ func (Release) BuildScalaContainer(ctx context.Context) error {
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:scala-%s", version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
-	if err := sh.Run("docker", "build", "-t", tag, "./docker/scala/Dockerfile" "--build-arg", buildArg); err != nil {
+	if err := sh.Run("docker", "build", "-t", tag, "./docker/scala/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
 		return err
