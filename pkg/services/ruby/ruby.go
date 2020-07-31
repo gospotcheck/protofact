@@ -97,7 +97,7 @@ func (s *Service) Process(ctx context.Context, payload github.PushPayload) {
 	// the http handler returns, it follows from that span so it will display correctly.
 	parentContext := opentracing.SpanFromContext(ctx).Context()
 	spanOption := opentracing.FollowsFrom(parentContext)
-	span := opentracing.StartSpan("process_scala", spanOption)
+	span := opentracing.StartSpan("process_ruby", spanOption)
 	defer span.Finish()
 
 	// creates a new copy of the context with the following span
@@ -152,7 +152,7 @@ func (s *Service) Process(ctx context.Context, payload github.PushPayload) {
 			version = fmt.Sprintf("1.0.%s.pre.%s", a, branchName)
 		}
 
-		// get all relevant subdirectories (java/com/*) and process them into their own directories to publish
+		// get all relevant subdirectories (ruby/*) and process them into their own directories to publish
 		dir, err := createGem(ctx, s.fs, s.config, s.logger, path, version, payload, procProps)
 		if err != nil {
 			s.metrics.AddPackagingErrors(prometheus.Labels{"type": "create"}, 1)
@@ -200,11 +200,11 @@ func (s *Service) cloneCode(ctx context.Context, payload github.PushPayload, pro
 	return cloneDir, nil
 }
 
-// CreateJars takes a path and finds all directories in the subpath of java/com in that path. We package at that level.
-// For those directories it processes the templates in the scala package to create a directory mirroring the structure
+// CreateJars takes a path and finds all directories in the subpath of "ruby" in that path. We package at that level.
+// For those directories it processes the templates in the ruby package to create a directory mirroring the structure
 // of a publishable jar.
 func createGem(ctx context.Context, fs fs, config Config, logger log.FieldLogger, codePath, version string, payload github.PushPayload, props processorProps) (string, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "create_jars")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "create_gem")
 	span.SetTag("directory", codePath)
 	// subdirectories of the language
 	gemSubDir := fmt.Sprintf("%s/ruby", codePath)
