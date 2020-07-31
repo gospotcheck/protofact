@@ -88,6 +88,8 @@ func (Release) Create() error {
 	}
 	token := string(byteToken)
 
+	fmt.Println("Creating release.")
+
 	gitConfig := git.Config{Token: token}
 	repo := git.New(ctx, gitConfig, logger)
 
@@ -129,6 +131,7 @@ func (Release) Create() error {
 
 // UploadLinux tars and uploads the linux binary to the release
 func (Release) UploadLinux(ctx context.Context) error {
+	fmt.Println("Uploading linux tarfile.")
 	if err := sh.Run("tar", "-czvf", "protofact_linux-amd64.tar.gz", "./protofact_linux-amd64"); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
@@ -169,6 +172,7 @@ func (Release) UploadLinux(ctx context.Context) error {
 
 // UploadDarwin tars and uploads the darwin binary to the release
 func (Release) UploadDarwin(ctx context.Context) error {
+	fmt.Println("Uploading darwin tar file.")
 	if err := sh.Run("tar", "-czvf", "protofact_darwin-amd64.tar.gz", "./protofact_darwin-amd64"); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
@@ -206,10 +210,11 @@ func (Release) UploadDarwin(ctx context.Context) error {
 }
 
 func (Release) BuildReleaseContainer(ctx context.Context) error {
+	fmt.Println("Building release container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:release-%s", version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
-	if err := sh.Run("docker", "build", "-t", tag, "./docker/release/Dockerfile", "--build-arg", buildArg); err != nil {
+	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/release/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
 		return err
@@ -221,6 +226,7 @@ func (Release) BuildReleaseContainer(ctx context.Context) error {
 }
 
 func (Release) PublishReleaseContainer(ctx context.Context) error {
+	fmt.Println("Publishing release container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:release-%s", version)
 	if err := sh.Run("docker", "push", tag); err != nil {
@@ -232,10 +238,11 @@ func (Release) PublishReleaseContainer(ctx context.Context) error {
 }
 
 func (Release) BuildRubyContainer(ctx context.Context) error {
+	fmt.Println("Building ruby container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:ruby-%s", version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
-	if err := sh.Run("docker", "build", "-t", tag, "./docker/ruby/Dockerfile", "--build-arg", buildArg); err != nil {
+	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/ruby/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
 		return err
@@ -247,6 +254,7 @@ func (Release) BuildRubyContainer(ctx context.Context) error {
 }
 
 func (Release) PublishRubyContainer(ctx context.Context) error {
+	fmt.Println("Publishing ruby container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:ruby-%s", version)
 	if err := sh.Run("docker", "push", tag); err != nil {
@@ -258,10 +266,11 @@ func (Release) PublishRubyContainer(ctx context.Context) error {
 }
 
 func (Release) BuildScalaContainer(ctx context.Context) error {
+	fmt.Println("Building scala container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:scala-%s", version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
-	if err := sh.Run("docker", "build", "-t", tag, "./docker/scala/Dockerfile", "--build-arg", buildArg); err != nil {
+	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/scala/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
 		return err
@@ -273,6 +282,7 @@ func (Release) BuildScalaContainer(ctx context.Context) error {
 }
 
 func (Release) PublishScalaContainer(ctx context.Context) error {
+	fmt.Println("Publishing scala container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:scala-%s", version)
 	if err := sh.Run("docker", "push", tag); err != nil {
