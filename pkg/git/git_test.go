@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"strings"
@@ -34,7 +35,7 @@ func TestCloneWithCheckout(t *testing.T) {
 		"language": "scala",
 	})
 
-	repo := New(Config{"auser", "apassword"}, logger)
+	repo := New(context.Background(), Config{"auser", "apassword"}, logger)
 	err = repo.CloneWithCheckout(path, payload)
 	if err != nil {
 		t.Error(err)
@@ -49,7 +50,7 @@ func TestCreateAuthenticatedURL(t *testing.T) {
 		"language": "scala",
 	})
 
-	repo := New(Config{"user", "password"}, logger)
+	repo := New(context.Background(), Config{"user", "password"}, logger)
 	url, err := repo.CreateAuthenticatedURL("https://github.com/org/repo")
 	if err != nil {
 		t.Error(err)

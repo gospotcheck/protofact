@@ -1,0 +1,12 @@
+FROM alpine:3.9.2
+
+ENV NAME protofact
+ENV LANGUAGE release
+
+RUN apk add --update bash curl git
+
+RUN touch config.yaml
+
+COPY protofact .
+
+CMD ./protofact
