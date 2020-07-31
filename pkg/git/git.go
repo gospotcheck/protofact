@@ -4,55 +4,52 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
+	"os/exec"
 	"strings"
 
-	"github.com/go-resty/resty/v2"
 	g "github.com/gogits/git-module"
+	"github.com/google/go-github/v32/github"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/go-playground/webhooks.v5/github"
+	"golang.org/x/oauth2"
+	hooks "gopkg.in/go-playground/webhooks.v5/github"
 )
 
 // Config represents the inputs needed to set up a Repo.
 type Config struct {
-	Username   string
-	Token      string
-	BaseAPIURL string
-}
-
-// CreateReleaseRequest is the fields necessary for the body of a
-// post request to create a release in Github.
-type CreateReleaseRequest struct {
-	TagName         string `json:"tag_name"`
-	TargetCommitish string `json:"target_commitish"`
-	Name            string `json:"name"`
-	Body            string `json:"body"`
-	Draft           bool   `json:"draft"`
-	Prerelease      bool   `json:"prerelease"`
+	Username string
+	Token    string
 }
 
 // Repo represents a git repository, which receives convenience methods
 // for retrieving code.
 type Repo struct {
-	username   string
-	token      string
-	logger     *log.Entry
-	baseAPIURL string
+	username string
+	token    string
+	logger   *log.Entry
+	client   *github.Client
 }
 
 // New creates a Repo struct using a Config struct.
-func New(c Config, logger *log.Entry) *Repo {
+func New(ctx context.Context, c Config, logger *log.Entry) *Repo {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: c.Token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	client := github.NewClient(tc)
+
 	return &Repo{
-		username:   c.Username,
-		token:      c.Token,
-		logger:     logger,
-		baseAPIURL: c.BaseAPIURL,
+		username: c.Username,
+		token:    c.Token,
+		logger:   logger,
+		client:   client,
 	}
 }
 
 // CloneWithCheckout uses a github Push Event payload to clone down a repository
 // and immediately checkout HEAD on the branch that caused that Push Event.
-func (r *Repo) CloneWithCheckout(tmpDir string, payload github.PushPayload) error {
+func (r *Repo) CloneWithCheckout(tmpDir string, payload hooks.PushPayload) error {
 	branch := g.RefEndName(payload.Ref)
 	url, err := r.CreateAuthenticatedURL(payload.Repository.CloneURL)
 	if err != nil {
@@ -83,38 +80,48 @@ func (r *Repo) CreateAuthenticatedURL(cloneURL string) (string, error) {
 
 // CreateRelease sends a request to github using the passed body and payload structs
 // to create a new release on a repo
-func (r *Repo) CreateRelease(ctx context.Context, req CreateReleaseRequest, payload github.PushPayload) error {
-	endpoint := fmt.Sprintf(
-		"%s/repos/%s/%s/releases",
-		r.baseAPIURL,
-		payload.Repository.Owner.Login,
-		payload.Repository.Name,
-	)
-
-	// make a release
-	// https://docs.github.com/en/rest/reference/repos#create-a-release
-	client := resty.New()
-	resp, err := client.R().
-		SetBody(req).
-		SetContext(ctx).
-		SetHeader("accept", "application/vnd.github.v3+json").
-		SetBasicAuth(r.username, r.token).
-		Post(endpoint)
-
+func (r *Repo) CreateRelease(ctx context.Context, owner, repo string, rel *github.RepositoryRelease) (*github.RepositoryRelease, error) {
+	rel, _, err := r.client.Repositories.CreateRelease(ctx, "gospotcheck", "protofact", rel)
 	if err != nil {
-		return errors.Wrap(err, "failed to create release")
+		return nil, errors.WithStack(err)
 	}
 
-	// default status code is 201, if it's not, and there wasn't an error
-	// something still likely went wrong
-	if resp.StatusCode() != int(201) {
-		msg := fmt.Sprintf(
-			"tag for repo %s on commit %s failed with code %d\n",
-			payload.Repository.FullName,
-			payload.HeadCommit.ID,
-			resp.StatusCode(),
-		)
-		return errors.New(msg)
+	return rel, nil
+}
+
+// CreateTag makes an annotated git tag on a repo.
+func (r Repo) CreateTag(dir, version, msg string) error {
+	tagCmd := exec.Command("git", "tag", "-a", version, "-m", msg)
+	tagCmd.Dir = dir
+	out, err := tagCmd.CombinedOutput()
+	r.logger.Debug(fmt.Sprintf("%s", out))
+	if err != nil {
+		errMessage := fmt.Sprintf("error tagging git repo: %s\n", out)
+		return errors.Wrap(err, errMessage)
+	}
+
+	return nil
+}
+
+// PushTags pushes a repo with no other changes but tags up to the origin.
+func (r Repo) PushTags(dir string) error {
+	pushCmd := exec.Command("git", "push", "--follow-tags")
+	pushCmd.Dir = dir
+	out, err := pushCmd.CombinedOutput()
+	r.logger.Debug(fmt.Sprintf("%s", out))
+	if err != nil {
+		errMessage := fmt.Sprintf("error pushing git tags: %s\n", out)
+		return errors.Wrap(err, errMessage)
+	}
+
+	return nil
+}
+
+// UploadReleaseAsset uploads a file to a Github release
+func (r Repo) UploadReleaseAsset(ctx context.Context, owner, repo string, releaseID int64, opts *github.UploadOptions, file *os.File) error {
+	_, _, err := r.client.Repositories.UploadReleaseAsset(ctx, "gospotcheck", "protofact", releaseID, opts, file)
+	if err != nil {
+		return errors.WithStack(err)
 	}
 
 	return nil
