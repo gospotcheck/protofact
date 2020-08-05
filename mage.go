@@ -38,6 +38,7 @@ type Build mg.Namespace
 func (Build) Linux() error {
 	os.Setenv("GOOS", "linux")
 	os.Setenv("GOARCH", "amd64")
+	os.Setenv("CGO_ENABLED", "0")
 	if err := sh.Run("go", "build", "-o", "protofact_linux-amd64"); err != nil {
 		return err
 	}
@@ -48,6 +49,7 @@ func (Build) Linux() error {
 func (Build) Darwin() error {
 	os.Setenv("GOOS", "darwin")
 	os.Setenv("GOARCH", "amd64")
+	os.Setenv("CGO_ENABLED", "0")
 	if err := sh.Run("go", "build", "-o", "protofact_darwin-amd64"); err != nil {
 		return err
 	}

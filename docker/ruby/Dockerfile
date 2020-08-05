@@ -19,6 +19,6 @@ RUN apk del wget curl
 
 RUN touch config.yaml
 
-RUN chmod +x protofact_linux-amd64
+RUN chmod +x protofact_linux-amd64 && mv protofact_linux-amd64 /usr/bin/protofact
 
-CMD ./protofact_linux-amd64
+CMD ["protofact"]
