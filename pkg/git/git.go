@@ -105,7 +105,7 @@ func (r *Repo) CreateAuthenticatedURL(cloneURL string) (string, error) {
 // CreateRelease sends a request to github using the passed body and payload structs
 // to create a new release on a repo
 func (r *Repo) CreateRelease(ctx context.Context, owner, repo string, rel *github.RepositoryRelease) (*github.RepositoryRelease, error) {
-	rel, _, err := r.client.Repositories.CreateRelease(ctx, "gospotcheck", "protofact", rel)
+	rel, _, err := r.client.Repositories.CreateRelease(ctx, owner, repo, rel)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
