@@ -20,6 +20,7 @@ import (
 type Config struct {
 	Username string
 	Token    string
+	Email    string
 }
 
 // Repo represents a git repository, which receives convenience methods
@@ -27,6 +28,7 @@ type Config struct {
 type Repo struct {
 	username string
 	token    string
+	email    string
 	logger   *log.Entry
 	client   *github.Client
 }
@@ -44,7 +46,29 @@ func New(ctx context.Context, c Config, logger *log.Entry) *Repo {
 		token:    c.Token,
 		logger:   logger,
 		client:   client,
+		email:    c.Email,
 	}
+}
+
+// SetGitConfig sets the email and name for usage when sending in git commits
+func (r *Repo) SetGitConfig() error {
+	emailCmd := exec.Command("git", "config", "--global", r.email)
+	out, err := emailCmd.CombinedOutput()
+	r.logger.Debug(fmt.Sprintf("%s", out))
+	if err != nil {
+		errMessage := fmt.Sprintf("error setting git config email: %s\n", out)
+		return errors.Wrap(err, errMessage)
+	}
+
+	nameCmd := exec.Command("git", "config", "--global", "protofact")
+	out, err = nameCmd.CombinedOutput()
+	r.logger.Debug(fmt.Sprintf("%s", out))
+	if err != nil {
+		errMessage := fmt.Sprintf("error setting git config name: %s\n", out)
+		return errors.Wrap(err, errMessage)
+	}
+
+	return nil
 }
 
 // CloneWithCheckout uses a github Push Event payload to clone down a repository

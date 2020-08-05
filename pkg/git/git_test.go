@@ -35,7 +35,7 @@ func TestCloneWithCheckout(t *testing.T) {
 		"language": "scala",
 	})
 
-	repo := New(context.Background(), Config{"auser", "apassword"}, logger)
+	repo := New(context.Background(), Config{"auser", "apassword", "dev@org.com"}, logger)
 	err = repo.CloneWithCheckout(path, payload)
 	if err != nil {
 		t.Error(err)
@@ -50,7 +50,7 @@ func TestCreateAuthenticatedURL(t *testing.T) {
 		"language": "scala",
 	})
 
-	repo := New(context.Background(), Config{"user", "password"}, logger)
+	repo := New(context.Background(), Config{"user", "password", "dev@org.com"}, logger)
 	url, err := repo.CreateAuthenticatedURL("https://github.com/org/repo")
 	if err != nil {
 		t.Error(err)
