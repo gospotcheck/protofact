@@ -52,7 +52,7 @@ func New(ctx context.Context, c Config, logger *log.Entry) *Repo {
 
 // SetGitConfig sets the email and name for usage when sending in git commits
 func (r *Repo) SetGitConfig() error {
-	emailCmd := exec.Command("git", "config", "--global", r.email)
+	emailCmd := exec.Command("git", "config", "--global", "user.email", r.email)
 	out, err := emailCmd.CombinedOutput()
 	r.logger.Debug(fmt.Sprintf("%s", out))
 	if err != nil {
@@ -60,7 +60,7 @@ func (r *Repo) SetGitConfig() error {
 		return errors.Wrap(err, errMessage)
 	}
 
-	nameCmd := exec.Command("git", "config", "--global", "protofact")
+	nameCmd := exec.Command("git", "config", "--global", "user.name", "protofact")
 	out, err = nameCmd.CombinedOutput()
 	r.logger.Debug(fmt.Sprintf("%s", out))
 	if err != nil {

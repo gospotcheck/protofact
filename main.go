@@ -155,7 +155,10 @@ func main() {
 			svc = ruby.New(conf.Ruby, fs, repo, logger, counters, opentracing.GlobalTracer())
 		case "release":
 			svc = release.New(fs, repo, logger, counters, opentracing.GlobalTracer())
-			repo.SetGitConfig()
+			err = repo.SetGitConfig()
+			if err != nil {
+				logger.Fatal("%+v\n", err)
+			}
 		default:
 			err = errors.New("LANGUAGE configuration did not match any supported language")
 			logger.Fatalf("%+v\n", err)
