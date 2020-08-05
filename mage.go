@@ -278,7 +278,7 @@ func (Release) BuildScalaContainer(ctx context.Context) error {
 		return err
 	}
 
-	mg.CtxDeps(ctx, Release.PublishRubyContainer)
+	mg.CtxDeps(ctx, Release.PublishScalaContainer)
 
 	return nil
 }
