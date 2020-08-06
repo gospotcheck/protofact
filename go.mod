@@ -32,6 +32,7 @@ require (
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/magefile/mage v1.10.0
 	github.com/magiconair/properties v1.8.1 // indirect
+	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mcuadros/go-version v0.0.0-20190308113854-92cdf37c5b75 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
 	github.com/neilotoole/gohdoc v1.0.2 // indirect
@@ -71,5 +72,5 @@ require (
 	google.golang.org/grpc v1.22.0 // indirect
 	gopkg.in/go-playground/webhooks.v5 v5.12.0
 	gopkg.in/resty.v1 v1.12.0
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.7
 )

@@ -34,6 +34,18 @@ type releaseResponse struct {
 // Build is a namespace for holding build commands
 type Build mg.Namespace
 
+func (Build) Packr2() error {
+	os.Setenv("GO111MODULE", "on")
+	os.Setenv("CGO_ENABLED", "0")
+	if err := sh.Run("packr2"); err != nil {
+		return err
+	}
+
+	mg.Deps(Build.Linux, Build.Darwin)
+
+	return nil
+}
+
 // Linux builds a linux binary
 func (Build) Linux() error {
 	os.Setenv("GOOS", "linux")
