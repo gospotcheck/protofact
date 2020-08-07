@@ -60,6 +60,7 @@ func (p *Parser) ValidateAndParsePushEvent(r *http.Request) (github.PushPayload,
 		if err == github.ErrEventNotFound {
 			return github.PushPayload{}, errors.Wrap(err, "event was not a push event")
 		}
+
 		return github.PushPayload{}, errors.Wrap(err, "error parsing webhook payload")
 	}
 	event := payload.(github.PushPayload)
