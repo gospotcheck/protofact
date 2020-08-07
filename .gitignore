@@ -22,3 +22,5 @@ k8s/secrets.yaml
 main-packr.go
 packrd
 *-packr.go
+
+protofact_linux-amd64*

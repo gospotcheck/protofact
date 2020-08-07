@@ -176,19 +176,6 @@ func main() {
 		defer span.Finish()
 		ctx = opentracing.ContextWithSpan(ctx, span)
 
-		// get two copies of request, because the webhook parser mutates it
-		var r2 *http.Request
-		ctx2 := context.Background()
-		r2 = r.Clone(ctx2)
-
-		// check if it's a ping event. We want to
-		// return OKs on ping events since they're how Github tests a new
-		// webhook. But that's it.
-		if prsr.IsPingEvent(r2) {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
 		// check push event
 		payload, err := prsr.ValidateAndParsePushEvent(r)
 		if err != nil {
