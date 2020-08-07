@@ -61,3 +61,5 @@ In no particular order...
 - [ ] C# support
 - [ ] Objective-C support
 - [ ] Java support
+
+We'd also like to move to a queue/worker based system for builds as right now if a package build fails it is lost.
