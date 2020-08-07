@@ -42,6 +42,16 @@ func NewParser(secure bool, config Config) (*Parser, error) {
 	}, nil
 }
 
+// IsPingEvent determines if the event is a Ping event by attempting
+// to parse it.
+func (p *Parser) IsPingEvent(r *http.Request) bool {
+	_, err := p.webhook.Parse(r, github.PingEvent)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 // ValidateAndParsePushEvent is a convenience method for receiving an http request,
 // ensuring it is specifically a Push Event payload and returning it as that struct.
 func (p *Parser) ValidateAndParsePushEvent(r *http.Request) (github.PushPayload, error) {
