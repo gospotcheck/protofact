@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/opentracing/opentracing-go"
@@ -42,6 +43,7 @@ type languageProcessor interface {
 
 type parser interface {
 	ValidateAndParsePushEvent(r *http.Request) (github.PushPayload, error)
+	IsPingEvent(r *http.Request) bool
 }
 
 func main() {
@@ -174,12 +176,20 @@ func main() {
 		defer span.Finish()
 		ctx = opentracing.ContextWithSpan(ctx, span)
 
+		// check if it's a ping event. We want to
+		// return OKs on ping events since they're how Github tests a new
+		// webhook. But that's it.
+		if prsr.IsPingEvent(r) {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		// check push event
 		payload, err := prsr.ValidateAndParsePushEvent(r)
 		if err != nil {
 			// if the request is bad log it and send it back
 			// so Github can register the error
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			err = errors.Wrap(err, "error validating and parsing push event")
 			logger.Errorf("%+v\n", err)
 			return
@@ -188,7 +198,14 @@ func main() {
 		// Github may not wait as long as it takes to do this processing
 		// so we want to handle failures in the app separately from
 		// failures in receiving the event
-		w.WriteHeader(200)
+		w.WriteHeader(http.StatusOK)
+
+		// ignore tags, as the release package pushes them, so otherwise
+		// it gets into a loop, and we end up packaging everything
+		// in other languages twice.
+		if strings.Contains(payload.Ref, "tags") {
+			return
+		}
 
 		// this is spun off as a cancelable goroutine
 		// so it is not blocking on the response to Github
@@ -199,7 +216,7 @@ func main() {
 
 	// basic health check endpoint
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
+		w.WriteHeader(http.StatusOK)
 	})
 
 	port := fmt.Sprintf(":%s", conf.Port)

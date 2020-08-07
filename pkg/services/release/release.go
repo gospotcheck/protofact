@@ -107,12 +107,6 @@ func (s *Service) Process(ctx context.Context, payload hooks.PushPayload) {
 		return
 	// otherwise, do our work
 	default:
-		// ignore tags, as we're trying to push them, so otherwise
-		// we get into a loop
-		if strings.Contains(payload.Ref, "tags") {
-			return
-		}
-
 		// clone down the repository
 		path, err := s.cloneCode(ctx, payload, procProps)
 		if err != nil {
