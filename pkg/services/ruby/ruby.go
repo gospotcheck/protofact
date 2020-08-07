@@ -149,6 +149,7 @@ func (s *Service) Process(ctx context.Context, payload github.PushPayload) {
 			// ruby gem version only allow periods as delimiters
 			branchName = strings.Replace(branchName, "/", ".", -1)
 			branchName = strings.Replace(branchName, "-", ".", -1)
+			branchName = strings.Replace(branchName, "_", ".", -1)
 			version = fmt.Sprintf("1.0.%s.pre.%s", a, branchName)
 		}
 
