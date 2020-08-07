@@ -34,37 +34,23 @@ type releaseResponse struct {
 // Build is a namespace for holding build commands
 type Build mg.Namespace
 
-func (Build) Packr2() error {
-	os.Setenv("GO111MODULE", "on")
-	os.Setenv("CGO_ENABLED", "0")
-	if err := sh.Run("packr2"); err != nil {
+func (Build) Compiler() error {
+	if err := sh.Run(
+		"docker", "build",
+		"-t", "gospotcheck/protofact:compiler", ".",
+		"-f", "./docker/compiler/Dockerfile",
+	); err != nil {
 		return err
 	}
-
-	mg.Deps(Build.Linux, Build.Darwin)
-
 	return nil
 }
 
 // Linux builds a linux binary
 func (Build) Linux() error {
-	os.Setenv("GOOS", "linux")
-	os.Setenv("GOARCH", "amd64")
-	os.Setenv("CGO_ENABLED", "0")
-	if err := sh.Run("go", "build", "-o", "protofact_linux-amd64"); err != nil {
+	if err := sh.Run("docker-compose", "run", "compiler", "./docker/compiler/compile.sh"); err != nil {
 		return err
 	}
-	return nil
-}
 
-// Darwin builds a darwin binary
-func (Build) Darwin() error {
-	os.Setenv("GOOS", "darwin")
-	os.Setenv("GOARCH", "amd64")
-	os.Setenv("CGO_ENABLED", "0")
-	if err := sh.Run("go", "build", "-o", "protofact_darwin-amd64"); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -138,7 +124,7 @@ func (Release) Create() error {
 	ctx = context.WithValue(ctx, releaseID, *rel.ID)
 	ctx = context.WithValue(ctx, tokenVal, token)
 	ctx = context.WithValue(ctx, versionVal, version)
-	mg.CtxDeps(ctx, Release.UploadLinux, Release.UploadDarwin)
+	mg.CtxDeps(ctx, Release.UploadLinux)
 
 	return nil
 }
@@ -180,45 +166,6 @@ func (Release) UploadLinux(ctx context.Context) error {
 	}
 
 	mg.CtxDeps(ctx, Release.BuildReleaseContainer, Release.BuildRubyContainer, Release.BuildScalaContainer)
-
-	return nil
-}
-
-// UploadDarwin tars and uploads the darwin binary to the release
-func (Release) UploadDarwin(ctx context.Context) error {
-	fmt.Println("Uploading darwin tar file.")
-	if err := sh.Run("tar", "-czvf", "protofact_darwin-amd64.tar.gz", "./protofact_darwin-amd64"); err != nil {
-		err = errors.WithStack(err)
-		fmt.Printf("%+v\n", err)
-		return err
-	}
-
-	id := ctx.Value(releaseID).(int64)
-	token := ctx.Value(tokenVal).(string)
-
-	file, err := os.Open("./protofact_darwin-amd64.tar.gz")
-	if err != nil {
-		err = errors.WithStack(err)
-		fmt.Printf("%+v\n", err)
-		return err
-	}
-
-	opts := &github.UploadOptions{
-		Name:      "protofact_darwin-amd64.tar.gz",
-		MediaType: "octet-stream",
-	}
-
-	logger := logrus.WithFields(logrus.Fields{
-		"executor": "mage",
-	})
-	gitConfig := git.Config{Token: token}
-	repo := git.New(ctx, gitConfig, logger)
-
-	if err = repo.UploadReleaseAsset(ctx, "gospotcheck", "protofact", id, opts, file); err != nil {
-		err = errors.WithStack(err)
-		fmt.Printf("%+v\n", err)
-		return err
-	}
 
 	return nil
 }

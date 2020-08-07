@@ -1,0 +1,13 @@
+version: "3.2"
+
+services:
+  compiler:
+    image: gospotcheck/protofact:compiler
+    build:
+      context: .
+    volumes:
+      - .:/work
+      # This next line ensures we don't copy local git history into the container since that can be a large number of
+      # files and prototool doesn't like a working directory with lots of files.
+      - /work/.git
+    working_dir: /work
