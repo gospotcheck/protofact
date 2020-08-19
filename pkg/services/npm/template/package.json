@@ -1,0 +1,16 @@
+{
+  "name": "{{ .PackageName }}",
+  "version": "{{ .Version }}",
+  "repository": {
+    "type": "git",
+    "url": "{{ .ProjectURL }}"
+  },
+  "homepage": "{{ .ProjectURL }}",
+  "files": [
+    "dist"
+  ],
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "google-protobuf": "^{{ .ProtobufVersion }}"
+  }
+}

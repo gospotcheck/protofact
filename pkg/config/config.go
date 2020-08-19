@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/gospotcheck/protofact/pkg/git"
+	"github.com/gospotcheck/protofact/pkg/services/npm"
 	"github.com/gospotcheck/protofact/pkg/services/ruby"
 	"github.com/gospotcheck/protofact/pkg/services/scala"
 	"github.com/gospotcheck/protofact/pkg/webhook"
@@ -28,6 +29,7 @@ type Values struct {
 	Ruby     ruby.Config
 	Scala    scala.Config
 	Webhook  webhook.Config
+	NPM      npm.Config
 }
 
 // Read will bring in config values from a YAML file at

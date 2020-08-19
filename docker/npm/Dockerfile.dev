@@ -1,0 +1,14 @@
+FROM alpine:3.12.0
+
+ARG PROTOFACT_VERSION
+
+ENV PF_NAME protofact
+ENV PF_LANGUAGE npm
+
+RUN apk add --update nodejs npm
+
+RUN touch config.yaml
+
+COPY protofact_linux-amd64 .
+
+CMD ./protofact_linux-amd64
