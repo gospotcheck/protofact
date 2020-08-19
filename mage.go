@@ -198,6 +198,34 @@ func (Release) PublishReleaseContainer(ctx context.Context) error {
 	return nil
 }
 
+func (Release) BuildReleaseContainer(ctx context.Context) error {
+	fmt.Println("Building npm container.")
+	version := ctx.Value(versionVal).(string)
+	tag := fmt.Sprintf("gospotcheck/protofact:npm-%s", version)
+	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
+	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/npm/Dockerfile", "--build-arg", buildArg); err != nil {
+		err = errors.WithStack(err)
+		fmt.Printf("%+v\n", err)
+		return err
+	}
+
+	mg.CtxDeps(ctx, Release.PublishReleaseContainer)
+
+	return nil
+}
+
+func (Release) PublishNPMContainer(ctx context.Context) error {
+	fmt.Println("Publishing npm container.")
+	version := ctx.Value(versionVal).(string)
+	tag := fmt.Sprintf("gospotcheck/protofact:npm-%s", version)
+	if err := sh.Run("docker", "push", tag); err != nil {
+		err = errors.WithStack(err)
+		fmt.Printf("%+v\n", err)
+		return err
+	}
+	return nil
+}
+
 func (Release) BuildRubyContainer(ctx context.Context) error {
 	fmt.Println("Building ruby container.")
 	version := ctx.Value(versionVal).(string)
