@@ -165,7 +165,7 @@ func (Release) UploadLinux(ctx context.Context) error {
 		return err
 	}
 
-	mg.CtxDeps(ctx, Release.BuildReleaseContainer, Release.BuildRubyContainer, Release.BuildScalaContainer)
+	mg.CtxDeps(ctx, Release.BuildNPMContainer, Release.BuildReleaseContainer, Release.BuildRubyContainer, Release.BuildScalaContainer)
 
 	return nil
 }
@@ -198,7 +198,7 @@ func (Release) PublishReleaseContainer(ctx context.Context) error {
 	return nil
 }
 
-func (Release) BuildReleaseContainer(ctx context.Context) error {
+func (Release) BuildNPMContainer(ctx context.Context) error {
 	fmt.Println("Building npm container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:npm-%s", version)
@@ -209,7 +209,7 @@ func (Release) BuildReleaseContainer(ctx context.Context) error {
 		return err
 	}
 
-	mg.CtxDeps(ctx, Release.PublishReleaseContainer)
+	mg.CtxDeps(ctx, Release.PublishNPMContainer)
 
 	return nil
 }
