@@ -25,6 +25,7 @@ import (
 	"github.com/gospotcheck/protofact/pkg/filesys"
 	"github.com/gospotcheck/protofact/pkg/git"
 	"github.com/gospotcheck/protofact/pkg/metrics"
+	"github.com/gospotcheck/protofact/pkg/services/npm"
 	"github.com/gospotcheck/protofact/pkg/services/release"
 	"github.com/gospotcheck/protofact/pkg/services/ruby"
 	"github.com/gospotcheck/protofact/pkg/services/scala"
@@ -151,6 +152,8 @@ func main() {
 	{
 		var err error
 		switch conf.Language {
+		case "npm":
+			svc = npm.New(conf.NPM, fs, repo, logger, counters, opentracing.GlobalTracer())
 		case "scala":
 			svc = scala.New(conf.Scala, fs, repo, logger, counters, opentracing.GlobalTracer())
 		case "ruby":
