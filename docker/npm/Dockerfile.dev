@@ -2,17 +2,13 @@ FROM alpine:3.12.0
 
 ARG PROTOFACT_VERSION
 
-ENV NAME protofact
-ENV LANGUAGE ts
+ENV PF_NAME protofact
+ENV PF_LANGUAGE npm
 
 RUN apk add --update nodejs npm
 
-RUN wget https://github.com/gospotcheck/protofact/releases/download/${PROTOFACT_VERSION}/protofact_linux-amd64.tar.gz && \
-  tar -xvf protofact_linux-amd64.tar.gz && \
-  rm protofact_linux-amd64.tar.gz
-
 RUN touch config.yaml
 
-COPY protofact .
+COPY protofact_linux-amd64 .
 
-CMD ./protofact
+CMD ./protofact_linux-amd64
