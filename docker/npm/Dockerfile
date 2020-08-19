@@ -5,7 +5,7 @@ ARG PROTOFACT_VERSION
 ENV NAME protofact
 ENV LANGUAGE ts
 
-RUN apk add --update nodejs npm
+RUN apk add --update nodejs npm git
 
 RUN wget https://github.com/gospotcheck/protofact/releases/download/${PROTOFACT_VERSION}/protofact_linux-amd64.tar.gz && \
   tar -xvf protofact_linux-amd64.tar.gz && \

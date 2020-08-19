@@ -5,7 +5,7 @@ ARG PROTOFACT_VERSION
 ENV PF_NAME protofact
 ENV PF_LANGUAGE npm
 
-RUN apk add --update nodejs npm
+RUN apk add --update nodejs npm git
 
 RUN touch config.yaml
 
