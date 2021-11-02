@@ -5,14 +5,18 @@ echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositorie
 apk update && apk add sbt openjdk8 gcc curl git wget ca-certificates
 
 SCALA_HOME=/usr/share/scala
+CrossScalaVersions=(CURRENT_SCALA_VERSION LEGACY_SCALA_VERSION)
 
-apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
-  apk add --no-cache bash && \
-  cd "/tmp" && \
-  wget "https://downloads.typesafe.com/scala/${CURRENT_SCALA_VERSION}/scala-${CURRENT_SCALA_VERSION}.tgz" && \
-  tar xzf "scala-${CURRENT_SCALA_VERSION}.tgz" && \
-  mkdir "${SCALA_HOME}" && \
-  rm "/tmp/scala-${CURRENT_SCALA_VERSION}/bin/"*.bat && \
-  mv "/tmp/scala-${CURRENT_SCALA_VERSION}/bin" "/tmp/scala-${CURRENT_SCALA_VERSION}/lib" "${SCALA_HOME}" && \
-  ln -s "${SCALA_HOME}/bin/"* "/usr/bin/" && \
-  rm -rf "/tmp/"*
+for sparkVersion in CrossScalaVersions
+do
+  apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
+    apk add --no-cache bash && \
+    cd "/tmp" && \
+    wget "https://downloads.typesafe.com/scala/${sparkVersion}/scala-${sparkVersion}.tgz" && \
+    tar xzf "scala-${sparkVersion}.tgz" && \
+    mkdir "${SCALA_HOME}" && \
+    rm "/tmp/scala-${sparkVersion}/bin/"*.bat && \
+    mv "/tmp/scala-${sparkVersion}/bin" "/tmp/scala-${sparkVersion}/lib" "${SCALA_HOME}" && \
+    ln -s "${SCALA_HOME}/bin/"* "/usr/bin/" && \
+    rm -rf "/tmp/"*
+done
