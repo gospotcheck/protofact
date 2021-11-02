@@ -12,6 +12,7 @@ type Config struct {
 	Realm                         string
 	SBTVersion                    string
 	SBTProtocPluginPackageVersion string
-	ScalaVersion                  string
+	CurrentScalaVersion           string
+	LegacyScalaVersion            string
 	ScalaPBRuntimePackageVersion  string
 }

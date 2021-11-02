@@ -22,7 +22,8 @@ scala:
   organization: company x
   publish: false
   realm: PrivateRepoProduct
-  sbtversion: '0.13.18'
-  scalaversion: '2.11.12'
+  sbtversion: '1.5.5'
+  currentScalaVersion: '2.12.10'
+  legacyScalaVersion: '2.11.12'
   sbtprotocpluginpackageversion: '0.99.33'
   scalapbtruntimepackageversion: '0.10.0-M4'

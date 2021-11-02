@@ -3,7 +3,11 @@ import sbt.Keys.credentials
 organization := "{{ .Organization }}"
 name := "{{ .Name }}"
 description := "{{ .Description }}"
-scalaVersion := "{{ .ScalaVersion }}"
+currentScalaVersion := "{{ .CurrentScalaVersion }}"
+legacyScalaVersion := "{{ .LegacyScalaVersion }}"
+
+scalaVersion := currentScalaVersion
+crossScalaVersions := Seq(currentScalaVersion, legacyScalaVersion)
 
 resolvers ++= Seq(
   "Maven Central" at "https://repo1.maven.org/maven2/",
@@ -24,10 +28,4 @@ libraryDependencies ++= (orgDeps ++ vendorDeps ++ testDeps)
 
 scalaSource in Compile := baseDirectory.value / "{{ .JarDir }}"
 
-lazy val commonSettings = Seq(
-  organization := "{{ .Organization }}",
-  scalaVersion := "{{ .ScalaVersion }}",
-  fork in run := true
-)
-
-lazy val app = (project in file(".")).settings(commonSettings: _*)
+lazy val app = (project in file(".")).settings(fork in run := true)
