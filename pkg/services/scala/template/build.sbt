@@ -3,7 +3,8 @@ import sbt.Keys.credentials
 organization := "{{ .Organization }}"
 name := "{{ .Name }}"
 description := "{{ .Description }}"
-currentScalaVersion := "{{ .CurrentScalaVersion }}"
+
+currentScalaVersion := "{{ .ScalaVersion }}"
 legacyScalaVersion := "{{ .LegacyScalaVersion }}"
 
 scalaVersion := currentScalaVersion
@@ -28,4 +29,10 @@ libraryDependencies ++= (orgDeps ++ vendorDeps ++ testDeps)
 
 scalaSource in Compile := baseDirectory.value / "{{ .JarDir }}"
 
-lazy val app = (project in file(".")).settings(fork in run := true)
+lazy val commonSettings = Seq(
+  organization := "{{ .Organization }}",
+  scalaVersion := "{{ .ScalaVersion }}",
+  fork in run := true
+)
+
+lazy val app = (project in file(".")).settings(commonSettings: _*)

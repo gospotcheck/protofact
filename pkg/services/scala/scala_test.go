@@ -61,7 +61,7 @@ func Test_CreateJars(t *testing.T) {
 		Realm:                         "Artifactory",
 		SBTVersion:                    "1.5.5",
 		SBTProtocPluginPackageVersion: "0.99.33",
-		CurrentScalaVersion            "2.12.10",
+		ScalaVersion                   "2.12.10",
 		LegacyScalaVersion             "2.11.12",
 		ScalaPBRuntimePackageVersion:  "0.10.0-M4",
 	}

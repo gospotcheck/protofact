@@ -66,7 +66,7 @@ type templateValues struct {
 	Realm                         string
 	SBTVersion                    string
 	SBTProtocPluginPackageVersion string
-	CurrentScalaVersion           string
+	ScalaVersion                  string
 	LegacyScalaVersion            string
 	ScalaPBRuntimePackageVersion  string
 	Snapshot                      bool
@@ -211,7 +211,7 @@ func createJar(ctx context.Context, fs fs, config Config, logger log.FieldLogger
 		Realm:                         config.Realm,
 		SBTVersion:                    config.SBTVersion,
 		SBTProtocPluginPackageVersion: config.SBTProtocPluginPackageVersion,
-		CurrentScalaVersion:           config.CurrentScalaVersion,
+		ScalaVersion:                  config.ScalaVersion,
 		LegacyScalaVersion:            config.LegacyScalaVersion,
 		ScalaPBRuntimePackageVersion:  config.ScalaPBRuntimePackageVersion,
 		Snapshot:                      snapshot,

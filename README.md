@@ -8,7 +8,6 @@
 Scala 2.11
 Scala 2.12
 ```
-To build against all versions listed in `crossScalaVersions`, prefix the `sbt` action(s) to run with a `+`.
 
 ## What It Is
 
