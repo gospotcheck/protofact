@@ -5,11 +5,9 @@ echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositorie
 apk update && apk add sbt openjdk8 gcc curl git wget ca-certificates
 
 SCALA_HOME=/usr/share/scala
-CURRENT_SCALA_VERSION=2.12.10
-LEGACY_SCALA_VERSION=2.11.12
 CROSS_SCALA_VERSIONS="${CURRENT_SCALA_VERSION} ${LEGACY_SCALA_VERSION}"
 
-for sparkVersion in CROSS_SCALA_VERSIONS
+for sparkVersion in $CROSS_SCALA_VERSIONS
 do
   apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
     apk add --no-cache bash && \
