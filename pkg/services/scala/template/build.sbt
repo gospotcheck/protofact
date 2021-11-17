@@ -4,8 +4,8 @@ organization := "{{ .Organization }}"
 name := "{{ .Name }}"
 description := "{{ .Description }}"
 
-currentScalaVersion := "{{ .ScalaVersion }}"
-legacyScalaVersion := "{{ .LegacyScalaVersion }}"
+val currentScalaVersion = "{{ .ScalaVersion }}"
+val legacyScalaVersion = "{{ .LegacyScalaVersion }}"
 
 scalaVersion := currentScalaVersion
 crossScalaVersions := Seq(currentScalaVersion, legacyScalaVersion)
