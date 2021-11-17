@@ -8,7 +8,13 @@ val currentScalaVersion = "{{ .ScalaVersion }}"
 val legacyScalaVersion = "{{ .LegacyScalaVersion }}"
 
 scalaVersion := currentScalaVersion
-crossScalaVersions := Seq(currentScalaVersion, legacyScalaVersion)
+crossScalaVersions := (
+  if (legacyScalaVersion.trim.isEmpty) {
+    Seq(currentScalaVersion)
+  } else {
+    Seq(currentScalaVersion, legacyScalaVersion)
+  }
+)
 
 resolvers ++= Seq(
   "Maven Central" at "https://repo1.maven.org/maven2/",

@@ -251,9 +251,9 @@ func createJar(ctx context.Context, fs fs, config Config, logger log.FieldLogger
 func publishJar(ctx context.Context, config Config, logger log.FieldLogger, path string) error {
 	var action string
 	if config.Publish {
-		action = "publish"
+		action = "+publish"
 	} else {
-		action = "compile"
+		action = "+compile"
 	}
 
 	span, _ := opentracing.StartSpanFromContext(ctx, action)
