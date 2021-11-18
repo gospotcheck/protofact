@@ -67,6 +67,7 @@ type templateValues struct {
 	SBTVersion                    string
 	SBTProtocPluginPackageVersion string
 	ScalaVersion                  string
+	LegacyScalaVersion            string
 	ScalaPBRuntimePackageVersion  string
 	Snapshot                      bool
 }
@@ -211,6 +212,7 @@ func createJar(ctx context.Context, fs fs, config Config, logger log.FieldLogger
 		SBTVersion:                    config.SBTVersion,
 		SBTProtocPluginPackageVersion: config.SBTProtocPluginPackageVersion,
 		ScalaVersion:                  config.ScalaVersion,
+		LegacyScalaVersion:            config.LegacyScalaVersion,
 		ScalaPBRuntimePackageVersion:  config.ScalaPBRuntimePackageVersion,
 		Snapshot:                      snapshot,
 	}
@@ -249,9 +251,9 @@ func createJar(ctx context.Context, fs fs, config Config, logger log.FieldLogger
 func publishJar(ctx context.Context, config Config, logger log.FieldLogger, path string) error {
 	var action string
 	if config.Publish {
-		action = "publish"
+		action = "+publish"
 	} else {
-		action = "compile"
+		action = "+compile"
 	}
 
 	span, _ := opentracing.StartSpanFromContext(ctx, action)

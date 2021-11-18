@@ -59,9 +59,10 @@ func Test_CreateJars(t *testing.T) {
 		Organization:                  "Org X",
 		Publish:                       false,
 		Realm:                         "Artifactory",
-		SBTVersion:                    "1.3.13",
+		SBTVersion:                    "1.5.5",
 		SBTProtocPluginPackageVersion: "0.99.33",
-		ScalaVersion:                  "2.11.12",
+		ScalaVersion                   "2.12.10",
+		LegacyScalaVersion             "2.11.12",
 		ScalaPBRuntimePackageVersion:  "0.10.0-M4",
 	}
 	if err != nil {

@@ -13,5 +13,6 @@ type Config struct {
 	SBTVersion                    string
 	SBTProtocPluginPackageVersion string
 	ScalaVersion                  string
+	LegacyScalaVersion            string
 	ScalaPBRuntimePackageVersion  string
 }

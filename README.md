@@ -3,6 +3,12 @@
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](code-of-conduct.md)[![GoDoc](https://godoc.org/gospotcheck/protofact?status.svg)](https://godoc.org/github.com/gospotcheck/protofact)
 
+### Cross-compiling Scala:
+```
+Scala 2.11
+Scala 2.12
+```
+
 ## What It Is
 
 Protofact is an application designed to work with [Uber's Prototool](https://github.com/uber/prototool) as the last
