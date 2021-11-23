@@ -23,7 +23,7 @@ to work on it (but ideally you're on the latest version).
 
 To get started, clone the repo and run `$ go mod download`.
 
-Protofact uses [Packr](https://github.com/gobuffalo/packr/tree/master/v2)
+Protofact uses [Packr](https://github.com/gobuffalo/packr/tree/master)
 boxes to supply templates into the binary. For the packages to work correctly, you'll
-need to install packr v2 via `$ go get -u github.com/gobuffalo/packr/v2/packr2` and then
+need to install packr v2 via `$ go get -u github.com/gobuffalo/packr/packr2` and then
 run `$ packr2` in the root directory of the project. See the docs on Packr for more info.
