@@ -20,5 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency 'grpc', '~> {{ .GRPCVersion }}'
+  spec.add_runtime_dependency 'grpc', '~> 1.52'
 end
