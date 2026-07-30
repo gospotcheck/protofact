@@ -11,6 +11,9 @@ ruby:
   gemrepouser: user
   gemrepopass: pass
   gemrepohost: https://somegemrepo.com
+  # Optional: also publish to Google Artifact Registry during the JFrog -> GAR migration.
+  # Auth uses a Workload Identity token from the metadata server, so no user/pass is needed.
+  garhost: https://us-east4-ruby.pkg.dev/union-station-69603e/ruby-internal
   gemname: proto-demo
   grpcversion: '1.19.0'
   homepage: https://github.com/someorg/somerepo

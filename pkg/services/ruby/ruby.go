@@ -3,6 +3,7 @@ package ruby
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -267,24 +268,97 @@ func publishGem(ctx context.Context, config Config, logger log.FieldLogger, path
 	span.Finish()
 
 	if config.Publish {
-		span, _ := opentracing.StartSpanFromContext(ctx, "push_gem")
-		span.SetTag("directory", path)
-
 		gemName := fmt.Sprintf("%s-%s.gem", config.GemName, version)
 
-		publishCmd := exec.Command("gem", "push", gemName, "--host", config.GemRepoHost)
-		publishCmd.Dir = path
-		out, err := publishCmd.CombinedOutput()
-		logger.Debug(fmt.Sprintf("%s", out))
-		if err != nil {
-			errMessage := fmt.Sprintf("error running gem push: %s\n", out)
-			return errors.Wrap(err, errMessage)
+		// Push to the JFrog gem repo. Auth comes from the credentials file
+		// written at startup by getGemCredentials.
+		if err := pushGem(ctx, logger, path, gemName, config.GemRepoHost, nil); err != nil {
+			return errors.Wrap(err, "could not push gem to gem repo host")
 		}
 
-		span.Finish()
+		// During the migration we also push to Google Artifact Registry when a
+		// GARHost is configured, so both JFrog and GAR stay in sync until all
+		// consumers have moved over. GAR uses a short-lived OAuth token instead
+		// of the credentials file, passed via GEM_HOST_API_KEY.
+		if config.GARHost != "" {
+			token, err := getGARToken(ctx)
+			if err != nil {
+				return errors.Wrap(err, "could not get GAR access token")
+			}
+			env := append(os.Environ(), fmt.Sprintf("GEM_HOST_API_KEY=Bearer %s", token))
+			if err := pushGem(ctx, logger, path, gemName, config.GARHost, env); err != nil {
+				return errors.Wrap(err, "could not push gem to GAR")
+			}
+		}
 	}
 
 	return nil
+}
+
+// pushGem runs `gem push` for the built gem against the given host. When env is
+// non-nil it is used as the command environment (e.g. to supply GEM_HOST_API_KEY
+// for token-based hosts like GAR); otherwise the process environment and the
+// ~/.gem/credentials file are used.
+func pushGem(ctx context.Context, logger log.FieldLogger, path, gemName, host string, env []string) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "push_gem")
+	span.SetTag("directory", path)
+	span.SetTag("host", host)
+	defer span.Finish()
+
+	publishCmd := exec.Command("gem", "push", gemName, "--host", host)
+	publishCmd.Dir = path
+	if env != nil {
+		publishCmd.Env = env
+	}
+	out, err := publishCmd.CombinedOutput()
+	logger.Debug(fmt.Sprintf("%s", out))
+	if err != nil {
+		errMessage := fmt.Sprintf("error running gem push to %s: %s\n", host, out)
+		return errors.Wrap(err, errMessage)
+	}
+
+	return nil
+}
+
+// getGARToken fetches a short-lived OAuth access token for the workload's service
+// account from the GCE/GKE metadata server. This relies on Workload Identity (or
+// a service account attached to the node) rather than a static credential.
+func getGARToken(ctx context.Context) (string, error) {
+	const metadataURL = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
+
+	req, err := http.NewRequest("GET", metadataURL, nil)
+	if err != nil {
+		return "", errors.Wrap(err, "could not create metadata token request")
+	}
+	req = req.WithContext(ctx)
+	req.Header.Set("Metadata-Flavor", "Google")
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", errors.Wrap(err, "could not fetch access token from metadata server")
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.Wrap(err, "could not read metadata token response")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.Errorf("metadata server returned %d fetching access token: %s", resp.StatusCode, body)
+	}
+
+	var token struct {
+		AccessToken string `json:"access_token"`
+	}
+	if err := json.Unmarshal(body, &token); err != nil {
+		return "", errors.Wrap(err, "could not unmarshal metadata token response")
+	}
+	if token.AccessToken == "" {
+		return "", errors.New("metadata server returned an empty access token")
+	}
+
+	return token.AccessToken, nil
 }
 
 // processTemplates processes all the templates and files in the template directory to the build directory.
