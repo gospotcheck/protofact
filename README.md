@@ -42,8 +42,12 @@ is in a folder named for that language.
 1. It builds and pushes the artifact.
 
 Protofact assumes that for each language, it is running in an OS environment that also has the CLI tools to package each language.
-Ruby should have `ruby` and `gems` installed, Node should have `npm`, Scala should have `sbt`, etc. We provide pre-built containers
-for each supported language so you can get going quickly.
+Ruby should have `ruby` and `gems` installed, Node should have `npm`, Scala should have `sbt`, Python should have `python3` with the
+`build` and `twine` packages installed, etc. We provide pre-built containers for each supported language so you can get going quickly.
+
+Python is a bit different from the other languages: rather than templating a package manifest from scratch, protofact expects the
+configured `sourcedir` to already contain a complete `pyproject.toml` (name, dependencies, namespace package config) committed to the
+repo alongside the generated code. Protofact only rewrites the `version` field before building the sdist/wheel and publishing it.
 
 ### Versioning of Artifacts
 
@@ -62,7 +66,7 @@ languages, and overall better! See our contributing page for details on how to c
 In no particular order...
 
 - [ ] Node/Typescript support
-- [ ] Python support
+- [x] Python support
 - [ ] C++ support
 - [ ] C# support
 - [ ] Objective-C support

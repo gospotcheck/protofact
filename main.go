@@ -26,6 +26,7 @@ import (
 	"github.com/gospotcheck/protofact/pkg/git"
 	"github.com/gospotcheck/protofact/pkg/metrics"
 	"github.com/gospotcheck/protofact/pkg/services/npm"
+	"github.com/gospotcheck/protofact/pkg/services/python"
 	"github.com/gospotcheck/protofact/pkg/services/release"
 	"github.com/gospotcheck/protofact/pkg/services/ruby"
 	"github.com/gospotcheck/protofact/pkg/services/scala"
@@ -158,6 +159,8 @@ func main() {
 			svc = scala.New(conf.Scala, fs, repo, logger, counters, opentracing.GlobalTracer())
 		case "ruby":
 			svc = ruby.New(conf.Ruby, fs, repo, logger, counters, opentracing.GlobalTracer())
+		case "python":
+			svc = python.New(conf.Python, fs, repo, logger, counters, opentracing.GlobalTracer())
 		case "release":
 			svc = release.New(fs, repo, logger, counters, opentracing.GlobalTracer())
 			err = repo.SetGitConfig()

@@ -165,7 +165,7 @@ func (Release) UploadLinux(ctx context.Context) error {
 		return err
 	}
 
-	mg.CtxDeps(ctx, Release.BuildNPMContainer, Release.BuildReleaseContainer, Release.BuildRubyContainer, Release.BuildScalaContainer)
+	mg.CtxDeps(ctx, Release.BuildNPMContainer, Release.BuildReleaseContainer, Release.BuildRubyContainer, Release.BuildScalaContainer, Release.BuildPythonContainer)
 
 	return nil
 }
@@ -246,6 +246,34 @@ func (Release) PublishRubyContainer(ctx context.Context) error {
 	fmt.Println("Publishing ruby container.")
 	version := ctx.Value(versionVal).(string)
 	tag := fmt.Sprintf("gospotcheck/protofact:ruby-%s", version)
+	if err := sh.Run("docker", "push", tag); err != nil {
+		err = errors.WithStack(err)
+		fmt.Printf("%+v\n", err)
+		return err
+	}
+	return nil
+}
+
+func (Release) BuildPythonContainer(ctx context.Context) error {
+	fmt.Println("Building python container.")
+	version := ctx.Value(versionVal).(string)
+	tag := fmt.Sprintf("gospotcheck/protofact:python-%s", version)
+	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
+	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/python/Dockerfile", "--build-arg", buildArg); err != nil {
+		err = errors.WithStack(err)
+		fmt.Printf("%+v\n", err)
+		return err
+	}
+
+	mg.CtxDeps(ctx, Release.PublishPythonContainer)
+
+	return nil
+}
+
+func (Release) PublishPythonContainer(ctx context.Context) error {
+	fmt.Println("Publishing python container.")
+	version := ctx.Value(versionVal).(string)
+	tag := fmt.Sprintf("gospotcheck/protofact:python-%s", version)
 	if err := sh.Run("docker", "push", tag); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)

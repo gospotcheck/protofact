@@ -27,3 +27,12 @@ scala:
   legacyScalaVersion: '2.11.12'
   sbtprotocpluginpackageversion: '0.99.33'
   scalapbtruntimepackageversion: '0.10.0-M4'
+python:
+  # sourcedir is the subdirectory in the repo containing a ready-made pyproject.toml
+  # (name, dependencies, namespace package config) - protofact only patches its version,
+  # it does not template one from scratch like it does for ruby/npm.
+  sourcedir: python
+  registryurl: https://somepypirepo.com
+  registryuser: user
+  registrypass: pass
+  publish: false
