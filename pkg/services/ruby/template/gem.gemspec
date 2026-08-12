@@ -9,14 +9,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = "{{ .Homepage }}"
   spec.files         = Dir["lib/**/*.rb"]
 
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "{{ .GemRepoHost }}"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against " \
-      "public gem pushes."
-  end
+  # allowed_push_host is intentionally left unset: Protofact publishes this gem
+  # to multiple hosts (JFrog and Google Artifact Registry) during the migration,
+  # and metadata['allowed_push_host'] can only whitelist a single host. Pushes are
+  # always made to an explicit --host, so this is not published to RubyGems.org.
 
   spec.require_paths = ["lib"]
 
