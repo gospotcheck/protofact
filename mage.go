@@ -27,6 +27,9 @@ const (
 	versionVal key = iota
 )
 
+// imageRepo is the Google Artifact Registry repository release images are pushed to
+const imageRepo = "us-east4-docker.pkg.dev/union-station-69603e/docker-internal/protofact"
+
 type releaseResponse struct {
 	UploadURL string `json:"upload_url"`
 }
@@ -173,7 +176,7 @@ func (Release) UploadLinux(ctx context.Context) error {
 func (Release) BuildReleaseContainer(ctx context.Context) error {
 	fmt.Println("Building release container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:release-%s", version)
+	tag := fmt.Sprintf("%s:release-%s", imageRepo, version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
 	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/release/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
@@ -189,7 +192,7 @@ func (Release) BuildReleaseContainer(ctx context.Context) error {
 func (Release) PublishReleaseContainer(ctx context.Context) error {
 	fmt.Println("Publishing release container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:release-%s", version)
+	tag := fmt.Sprintf("%s:release-%s", imageRepo, version)
 	if err := sh.Run("docker", "push", tag); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
@@ -201,7 +204,7 @@ func (Release) PublishReleaseContainer(ctx context.Context) error {
 func (Release) BuildNPMContainer(ctx context.Context) error {
 	fmt.Println("Building npm container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:npm-%s", version)
+	tag := fmt.Sprintf("%s:npm-%s", imageRepo, version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
 	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/npm/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
@@ -217,7 +220,7 @@ func (Release) BuildNPMContainer(ctx context.Context) error {
 func (Release) PublishNPMContainer(ctx context.Context) error {
 	fmt.Println("Publishing npm container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:npm-%s", version)
+	tag := fmt.Sprintf("%s:npm-%s", imageRepo, version)
 	if err := sh.Run("docker", "push", tag); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
@@ -229,7 +232,7 @@ func (Release) PublishNPMContainer(ctx context.Context) error {
 func (Release) BuildRubyContainer(ctx context.Context) error {
 	fmt.Println("Building ruby container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:ruby-%s", version)
+	tag := fmt.Sprintf("%s:ruby-%s", imageRepo, version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
 	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/ruby/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
@@ -245,7 +248,7 @@ func (Release) BuildRubyContainer(ctx context.Context) error {
 func (Release) PublishRubyContainer(ctx context.Context) error {
 	fmt.Println("Publishing ruby container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:ruby-%s", version)
+	tag := fmt.Sprintf("%s:ruby-%s", imageRepo, version)
 	if err := sh.Run("docker", "push", tag); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
@@ -257,7 +260,7 @@ func (Release) PublishRubyContainer(ctx context.Context) error {
 func (Release) BuildScalaContainer(ctx context.Context) error {
 	fmt.Println("Building scala container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:scala-%s", version)
+	tag := fmt.Sprintf("%s:scala-%s", imageRepo, version)
 	buildArg := fmt.Sprintf("PROTOFACT_VERSION=%s", version)
 	if err := sh.Run("docker", "build", "-t", tag, ".", "-f", "./docker/scala/Dockerfile", "--build-arg", buildArg); err != nil {
 		err = errors.WithStack(err)
@@ -273,7 +276,7 @@ func (Release) BuildScalaContainer(ctx context.Context) error {
 func (Release) PublishScalaContainer(ctx context.Context) error {
 	fmt.Println("Publishing scala container.")
 	version := ctx.Value(versionVal).(string)
-	tag := fmt.Sprintf("gospotcheck/protofact:scala-%s", version)
+	tag := fmt.Sprintf("%s:scala-%s", imageRepo, version)
 	if err := sh.Run("docker", "push", tag); err != nil {
 		err = errors.WithStack(err)
 		fmt.Printf("%+v\n", err)
